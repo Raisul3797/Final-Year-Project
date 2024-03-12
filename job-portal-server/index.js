@@ -60,13 +60,13 @@ async function run() {
     })
 
 
-    //get single job by ID
+    //get a single job using ID
     app.get("/all-jobs/:id", async(req, res) => {
       const id = req.params.id;
       const job = await jobsCollection.findOne({
         _id: new ObjectId(id)
       })
-      res.send(job);
+      res.send(job)
     }) 
 
 
@@ -85,6 +85,22 @@ async function run() {
       const result = await jobsCollection.deleteOne(filter);
       res.send(result);
     })
+
+    // Update a job
+    app.patch("/update-job/:id", async(req, res) => {
+      const id = req.params.id;
+      const jobData = req.body;
+      const filter = {_id: new ObjectId(id)};
+      const options = {upsert: true};
+      const updateDoc ={
+        $set: {
+          ...jobData
+        },
+      };
+      const result = await jobsCollection.updateOne(filter, updateDoc, options);
+      res.send(result)
+    })
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
